@@ -1,0 +1,75 @@
+<% turnover = snapshot["turnover"] || {} %>
+
+<% if turnover.empty? || turnover["exits"].nil? || turnover["exits"].zero? %>
+  <%= render "empty_section", message: "No turnover dataset linked yet." %>
+<% else %>
+  <div class="grid grid-cols-3 gap-4 mb-7">
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Turnover rate</div>
+      <div class="text-3xl font-bold tabular-nums text-stone-900"><%= format_percent(turnover["rate"]) %></div>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Total exits</div>
+      <div class="text-3xl font-bold tabular-nums text-stone-900"><%= turnover["exits"].nil? ? "—" : turnover["exits"] %></div>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Avg tenure</div>
+      <div class="text-3xl font-bold tabular-nums text-stone-900"><%= turnover["average_tenure_months"]&.round(1) || "—" %></div>
+      <div class="text-[11px] text-stone-400 mt-1">months</div>
+    </div>
+  </div>
+
+  <% by_month = turnover["by_month"] || {} %>
+  <% if by_month.any? %>
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden mb-5">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Exits over time</h2>
+      </div>
+      <div class="px-6 py-5" data-controller="line-chart" data-line-chart-data-value="<%= by_month.to_json %>">
+        <canvas height="200" class="w-full"></canvas>
+      </div>
+    </section>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <% reasons = turnover["by_reason"] || {} %>
+    <% if reasons.any? %>
+      <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-stone-100">
+          <h2 class="text-sm font-semibold text-stone-800">Exit reasons</h2>
+        </div>
+        <div class="px-6 py-5" data-controller="doughnut-chart"
+             data-doughnut-chart-data-value="<%= reasons.map { |k, v| { label: k, count: v } }.to_json %>">
+          <canvas height="220" class="w-full"></canvas>
+        </div>
+      </section>
+    <% end %>
+
+    <% tenure = turnover["tenure_distribution"] || [] %>
+    <% if tenure.any? && tenure.any? { |b| b["count"].to_i > 0 } %>
+      <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-stone-100">
+          <h2 class="text-sm font-semibold text-stone-800">Tenure at exit</h2>
+        </div>
+        <div class="px-6 py-5" data-controller="bar-chart"
+             data-bar-chart-data-value="<%= tenure.map { |b| { range: b['range'], count: b['count'] } }.to_json %>">
+          <canvas height="220" class="w-full"></canvas>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <% by_role = turnover["by_role"] || {} %>
+  <% if by_role.any? %>
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden mt-5">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Exits by role</h2>
+      </div>
+      <div class="px-6 py-5" data-controller="bar-chart"
+           data-bar-chart-data-value="<%= by_role.sort_by { |_, v| -v }.map { |k, v| { range: k, count: v } }.to_json %>"
+           data-bar-chart-orientation-value="horizontal">
+        <canvas height="<%= [by_role.size * 30 + 40, 160].max %>" class="w-full"></canvas>
+      </div>
+    </section>
+  <% end %>
+<% end %>

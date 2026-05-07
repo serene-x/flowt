@@ -1,0 +1,59 @@
+<div class="px-6 py-4">
+  <div class="flex items-center gap-2.5 mb-3">
+    <span class="text-sm font-semibold text-stone-800"><%= column.name %></span>
+    <% type_color = case column.data_type
+       when "numeric" then "bg-violet-50 text-violet-700"
+       when "categorical" then "bg-sky-50 text-sky-700"
+       when "date" then "bg-amber-50 text-amber-700"
+       else "bg-stone-100 text-stone-500"
+       end %>
+    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider <%= type_color %>"><%= column.data_type %></span>
+  </div>
+
+  <% stats = column.stats || {} %>
+  <% case column.data_type %>
+  <% when "numeric" %>
+    <div class="grid grid-cols-5 gap-3 text-sm mb-3">
+      <%= render "stat_cell", label: "Min", value: stats["min"] %>
+      <%= render "stat_cell", label: "Max", value: stats["max"] %>
+      <%= render "stat_cell", label: "Mean", value: stats["mean"] %>
+      <%= render "stat_cell", label: "Median", value: stats["median"] %>
+      <%= render "stat_cell", label: "Nulls", value: stats["null_count"] %>
+    </div>
+    <% if stats["histogram"].present? %>
+      <div data-controller="bar-chart" data-bar-chart-data-value="<%= stats['histogram'].to_json %>" data-bar-chart-orientation-value="vertical">
+        <canvas height="100" class="w-full"></canvas>
+      </div>
+    <% end %>
+  <% when "categorical" %>
+    <div class="grid grid-cols-3 gap-3 text-sm mb-3">
+      <%= render "stat_cell", label: "Unique", value: stats["unique_count"] %>
+      <%= render "stat_cell", label: "Nulls", value: stats["null_count"] %>
+      <%= render "stat_cell", label: "Total", value: stats["count"] %>
+    </div>
+    <% if stats["top_values"].present? %>
+      <div data-controller="bar-chart" data-bar-chart-data-value="<%= stats['top_values'].map { |v| { 'range' => v['label'], 'count' => v['count'] } }.to_json %>" data-bar-chart-orientation-value="horizontal">
+        <canvas height="<%= [stats['top_values'].size * 24, 100].max %>" class="w-full"></canvas>
+      </div>
+    <% end %>
+  <% when "date" %>
+    <div class="grid grid-cols-4 gap-3 text-sm mb-3">
+      <%= render "stat_cell", label: "Earliest", value: stats["min"] %>
+      <%= render "stat_cell", label: "Latest", value: stats["max"] %>
+      <%= render "stat_cell", label: "Unique", value: stats["unique_count"] %>
+      <%= render "stat_cell", label: "Nulls", value: stats["null_count"] %>
+    </div>
+    <% if stats["by_month"].present? %>
+      <div data-controller="line-chart" data-line-chart-data-value="<%= stats['by_month'].to_json %>">
+        <canvas height="100" class="w-full"></canvas>
+      </div>
+    <% end %>
+  <% when "text" %>
+    <div class="grid grid-cols-4 gap-3 text-sm">
+      <%= render "stat_cell", label: "Avg words", value: stats["avg_word_count"] %>
+      <%= render "stat_cell", label: "Max words", value: stats["max_word_count"] %>
+      <%= render "stat_cell", label: "Unique", value: stats["unique_count"] %>
+      <%= render "stat_cell", label: "Nulls", value: stats["null_count"] %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,31 @@
+event_name,department,event_date,format,invited,attended,attendance_rate
+Q1 All-Hands,Engineering,2025-01-22,Hybrid,45,38,0.84
+Q1 All-Hands,Marketing,2025-01-22,Hybrid,18,16,0.89
+Q1 All-Hands,Sales,2025-01-22,Hybrid,32,22,0.69
+Q1 All-Hands,People Ops,2025-01-22,Hybrid,8,8,1.00
+Engineering Offsite,Engineering,2025-02-10,In-Person,45,43,0.96
+Marketing Workshop,Marketing,2025-02-15,In-Person,18,17,0.94
+Sales Kickoff,Sales,2025-02-20,In-Person,32,31,0.97
+HR Town Hall,People Ops,2025-02-05,Virtual,8,7,0.88
+Tech Talk - Distributed Systems,Engineering,2025-03-12,Virtual,45,29,0.64
+Brand Strategy Session,Marketing,2025-03-18,In-Person,18,17,0.94
+Pipeline Review,Sales,2025-03-25,Virtual,32,25,0.78
+Manager Training,People Ops,2025-03-02,Hybrid,8,8,1.00
+Q2 All-Hands,Engineering,2025-04-22,Hybrid,46,37,0.80
+Q2 All-Hands,Marketing,2025-04-22,Hybrid,17,14,0.82
+Q2 All-Hands,Sales,2025-04-22,Hybrid,30,21,0.70
+Q2 All-Hands,People Ops,2025-04-22,Hybrid,9,9,1.00
+Engineering Learning Day,Engineering,2025-04-10,In-Person,45,40,0.89
+Content Planning Workshop,Marketing,2025-04-08,In-Person,18,16,0.89
+Sales Enablement,Sales,2025-04-15,Virtual,32,28,0.88
+Recruiting Sync,People Ops,2025-04-03,Virtual,8,7,0.88
+Architecture Review,Engineering,2025-05-14,Virtual,45,32,0.71
+Demand Gen Planning,Marketing,2025-05-20,In-Person,18,15,0.83
+Quarterly Business Review,Sales,2025-05-06,Hybrid,32,29,0.91
+Culture Workshop,People Ops,2025-05-08,In-Person,9,9,1.00
+Q3 All-Hands,Engineering,2025-06-25,Hybrid,46,39,0.85
+Q3 All-Hands,Marketing,2025-06-25,Hybrid,17,13,0.76
+Q3 All-Hands,Sales,2025-06-25,Hybrid,31,20,0.65
+Q3 All-Hands,People Ops,2025-06-25,Hybrid,9,9,1.00
+Hackathon,Engineering,2025-06-12,In-Person,45,38,0.84
+Social Media Sprint,Marketing,2025-06-10,Virtual,18,12,0.67

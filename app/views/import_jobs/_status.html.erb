@@ -1,0 +1,62 @@
+<% bar_color = case job.status
+   when "complete" then "bg-emerald-500"
+   when "failed" then "bg-rose-500"
+   else "bg-indigo-500"
+   end
+%>
+
+<div class="bg-white border border-stone-200 rounded-xl shadow-sm p-6">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2.5">
+      <% case job.status %>
+      <% when "queued", "processing" %>
+        <svg class="w-4 h-4 text-indigo-500 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity=".25"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        <span class="text-sm font-medium text-stone-800"><%= job.current_step || "Queued" %>…</span>
+      <% when "complete" %>
+        <svg class="w-5 h-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        <span class="text-sm font-medium text-emerald-700">Import complete</span>
+      <% when "failed" %>
+        <svg class="w-5 h-5 text-rose-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+        <span class="text-sm font-medium text-rose-700">Import failed</span>
+      <% end %>
+    </div>
+    <span class="text-xs text-stone-400 font-medium tabular-nums"><%= job.progress_percent %>%</span>
+  </div>
+
+  <div class="h-2 bg-stone-100 rounded-full overflow-hidden">
+    <div class="h-full <%= bar_color %> transition-all duration-500" style="width: <%= job.progress_percent %>%"></div>
+  </div>
+
+  <div class="mt-5 space-y-1.5">
+    <% ImportJob::STEPS.each_with_index do |step, idx| %>
+      <% reached = job.progress_percent >= ((idx + 1).to_f / ImportJob::STEPS.size * 100).round - 1 %>
+      <% current = job.current_step == step %>
+      <div class="flex items-center gap-2 text-sm <%= reached ? 'text-stone-700' : 'text-stone-300' %>">
+        <% if current && job.status == "processing" %>
+          <svg class="w-3 h-3 text-indigo-500 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity=".25"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        <% elsif reached %>
+          <svg class="w-3 h-3 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+        <% else %>
+          <span class="w-3 h-3 rounded-full border border-stone-200 inline-block"></span>
+        <% end %>
+        <%= step %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if job.status == "complete" %>
+    <div class="mt-6 flex gap-2">
+      <%= link_to "View dataset", dataset_path(job.dataset), class: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors" %>
+      <%= link_to "All jobs", import_jobs_path, class: "inline-flex items-center px-3 py-2 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-sm text-stone-700 font-medium" %>
+    </div>
+  <% elsif job.status == "failed" %>
+    <div class="mt-6">
+      <% if job.error_message.present? %>
+        <div class="px-3 py-2 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 text-sm"><%= job.error_message %></div>
+      <% end %>
+      <div class="mt-3">
+        <%= link_to "Try another upload", new_dataset_path, class: "inline-flex items-center px-3 py-2 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-sm text-stone-700 font-medium" %>
+      </div>
+    </div>
+  <% end %>
+</div>

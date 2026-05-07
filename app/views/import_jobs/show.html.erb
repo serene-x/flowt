@@ -1,0 +1,18 @@
+<% page_title = "Import in progress" %>
+
+<%= turbo_stream_from "import_job_#{@job.id}" %>
+
+<% unless @job.status.in?(%w[complete failed]) %>
+  <meta http-equiv="refresh" content="4">
+<% end %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-xl font-bold text-stone-900">Importing dataset</h1>
+    <p class="text-sm text-stone-500 mt-1"><%= @job.dataset.name %></p>
+  </div>
+
+  <div id="import_job_status">
+    <%= render "status", job: @job %>
+  </div>
+</div>

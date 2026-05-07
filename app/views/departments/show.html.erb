@@ -1,0 +1,66 @@
+<% snapshot = @profile.snapshot_data || {} %>
+
+<div class="flex items-start justify-between mb-6">
+  <div>
+    <div class="flex items-center gap-1.5 text-xs text-stone-400 mb-2">
+      <%= link_to "Departments", departments_path, class: "hover:text-stone-700 transition-colors" %>
+      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      <span class="text-stone-600"><%= @department.name %></span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-lg">
+        <%= @department.name[0].upcase %>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold text-stone-900"><%= @department.name %></h1>
+        <div class="text-xs text-stone-400 mt-0.5">
+          <%= pluralize(@datasets.size, "dataset") %> linked
+          · last refreshed <%= @profile.refreshed_at ? time_ago_in_words(@profile.refreshed_at) + " ago" : "never" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 flex-wrap">
+    <%= button_to refresh_department_path(@department), method: :post, class: "inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-sm text-stone-700 font-medium transition-colors shadow-sm" do %>
+      <svg class="w-3.5 h-3.5 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0114.13-3.13M20 15a9 9 0 01-14.13 3.13"/></svg>
+      Refresh
+    <% end %>
+    <%= link_to export_full_pdf_department_path(@department), class: "inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors shadow-sm" do %>
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      Full report
+    <% end %>
+    <%= link_to export_pdf_department_path(@department), class: "inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-sm text-stone-700 font-medium transition-colors shadow-sm" do %>
+      <svg class="w-3.5 h-3.5 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      Comms PDF
+    <% end %>
+    <%= link_to export_csv_department_path(@department), class: "inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-sm text-stone-700 font-medium transition-colors shadow-sm" do %>
+      <svg class="w-3.5 h-3.5 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg>
+      CSV
+    <% end %>
+  </div>
+</div>
+
+<%= render "ai_summary", department: @department, ai_summary: @ai_summary %>
+<%= render "insight_cards", cards: @insight_cards %>
+<%= render "recommendations", recommendations: @recommendations %>
+
+<nav class="flex items-center gap-0.5 mb-6 bg-stone-100 rounded-xl p-1 w-fit">
+  <% %w[overview engagement turnover events feedback comms].each do |s| %>
+    <%= link_to s.titleize, department_path(@department, section: s), class: "px-4 py-1.5 rounded-lg text-sm font-medium transition-all #{@section == s ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-800'}" %>
+  <% end %>
+</nav>
+
+<% case @section %>
+<% when "overview" %>
+  <%= render "overview", department: @department, snapshot: snapshot, datasets: @datasets %>
+<% when "engagement" %>
+  <%= render "engagement", snapshot: snapshot, department: @department %>
+<% when "turnover" %>
+  <%= render "turnover", snapshot: snapshot %>
+<% when "events" %>
+  <%= render "events", snapshot: snapshot, department: @department %>
+<% when "feedback" %>
+  <%= render "feedback", snapshot: snapshot %>
+<% when "comms" %>
+  <%= render "comms", snapshot: snapshot %>
+<% end %>

@@ -1,0 +1,124 @@
+<% page_title = "Benchmarks" %>
+
+<% if @rows.empty? %>
+  <div class="max-w-lg mx-auto mt-20 text-center">
+    <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-5">
+      <svg class="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    </div>
+    <h2 class="text-xl font-semibold text-stone-900">No data yet</h2>
+    <p class="text-sm text-stone-500 mt-2 leading-relaxed">Upload a CSV with engagement scores, turnover history, event attendance, or feedback to start building department profiles.</p>
+    <div class="mt-6">
+      <%= link_to "Upload your first dataset", new_dataset_path, class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors shadow-sm" %>
+    </div>
+  </div>
+<% else %>
+  <div class="mb-6 flex items-end justify-between gap-6">
+    <div>
+      <h1 class="text-xl font-bold text-stone-900">Benchmarks</h1>
+      <p class="text-sm text-stone-500 mt-0.5">Cross-department metrics, color-coded against the chosen benchmark</p>
+    </div>
+    <%= form_with url: root_path, method: :get, local: true, class: "flex items-center gap-2" do %>
+      <label class="text-xs text-stone-500 font-medium">Benchmark against:</label>
+      <%= select_tag :benchmark_against,
+            options_for_select(
+              [["Company average", "company"]] + @rows.map { |r| [r.name, r.slug] },
+              @benchmark_slug || "company"
+            ),
+            class: "px-3 py-1.5 text-sm border border-stone-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500",
+            onchange: "this.form.submit()" %>
+    <% end %>
+  </div>
+
+  <div class="bg-gradient-to-br from-indigo-50 via-white to-violet-50 border border-indigo-200 rounded-xl p-5 mb-6 grid grid-cols-2 md:grid-cols-5 gap-4">
+    <% bench_label = @benchmark_slug.present? && @benchmark_slug != "company" ? @benchmark[:name] : "Company average" %>
+    <div>
+      <div class="text-[10px] uppercase tracking-widest font-semibold text-indigo-700 opacity-70"><%= bench_label %></div>
+      <div class="text-xs text-stone-500 mt-0.5">Reference benchmark</div>
+    </div>
+    <div>
+      <div class="text-[10px] uppercase tracking-widest font-semibold text-stone-400">Headcount</div>
+      <div class="text-xl font-bold tabular-nums text-stone-900"><%= @benchmark[:headcount]&.round(0) || "—" %></div>
+    </div>
+    <div>
+      <div class="text-[10px] uppercase tracking-widest font-semibold text-stone-400">Engagement</div>
+      <div class="text-xl font-bold tabular-nums text-stone-900"><%= @benchmark[:engagement] ? "#{@benchmark[:engagement].round(2)} (#{@benchmark[:engagement_n]} depts)" : "—" %></div>
+    </div>
+    <div>
+      <div class="text-[10px] uppercase tracking-widest font-semibold text-stone-400">Turnover</div>
+      <div class="text-xl font-bold tabular-nums text-stone-900"><%= format_percent(@benchmark[:turnover]) %></div>
+    </div>
+    <div>
+      <div class="text-[10px] uppercase tracking-widest font-semibold text-stone-400">Attendance</div>
+      <div class="text-xl font-bold tabular-nums text-stone-900"><%= format_percent(@benchmark[:attendance]) %></div>
+    </div>
+  </div>
+
+  <%
+    sort_link = ->(key, label, align: "left") {
+      next_dir = (@sort == key && @direction == "asc") ? "desc" : "asc"
+      arrow = @sort == key ? (@direction == "asc" ? "↑" : "↓") : ""
+      url = root_path(sort: key, dir: next_dir, benchmark_against: @benchmark_slug)
+      classes = "flex items-center gap-1 #{align == 'right' ? 'justify-end' : ''} hover:text-stone-700 transition-colors"
+      link_to "#{label} #{arrow}".html_safe, url, class: classes
+    }
+  %>
+
+  <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-[11px] uppercase tracking-wider text-stone-400 bg-stone-50 border-b border-stone-100">
+          <th class="text-left px-6 py-3.5 font-semibold"><%= sort_link.call("name", "Department") %></th>
+          <th class="text-right px-4 py-3.5 font-semibold"><%= sort_link.call("headcount", "Headcount", align: "right") %></th>
+          <th class="text-right px-4 py-3.5 font-semibold"><%= sort_link.call("turnover", "Turnover", align: "right") %></th>
+          <th class="text-right px-4 py-3.5 font-semibold"><%= sort_link.call("engagement", "Engagement", align: "right") %></th>
+          <th class="text-right px-4 py-3.5 font-semibold"><%= sort_link.call("attendance", "Attendance", align: "right") %></th>
+          <th class="text-right px-4 py-3.5 font-semibold">
+            <%= sort_link.call("sentiment", "Feedback", align: "right") %>
+            <div class="text-[9px] font-normal text-stone-300 normal-case tracking-normal">% positive</div>
+          </th>
+          <th class="text-left px-4 py-3.5 font-semibold"><%= sort_link.call("last_updated", "Updated") %></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-stone-50">
+        <% @rows.each do |row| %>
+          <%
+            tband = ThresholdService.turnover_band(row.turnover)
+            eband = ThresholdService.engagement_band(row.engagement)
+            aband = ThresholdService.attendance_band(row.attendance)
+            sband = if row.sentiment_pos_share.nil?
+                      :unknown
+                    elsif row.sentiment_pos_share > ThresholdService::SENTIMENT_POSITIVE_HEALTHY then :healthy
+                    elsif row.sentiment_pos_share < 0.4 then :critical
+                    else :neutral
+                    end
+            cell_classes = ->(band) {
+              case band
+              when :critical then "bg-rose-50 text-rose-700 font-semibold"
+              when :warning then "bg-amber-50 text-amber-700 font-semibold"
+              when :healthy then "bg-emerald-50 text-emerald-700 font-semibold"
+              else "text-stone-700"
+              end
+            }
+          %>
+          <tr class="hover:bg-stone-50/60 transition-colors cursor-pointer" onclick="window.location='<%= department_path(row.slug) %>'">
+            <td class="px-6 py-3.5">
+              <%= link_to row.name, department_path(row.slug), class: "font-medium text-stone-900 hover:text-indigo-600 transition-colors" %>
+            </td>
+            <td class="px-4 py-3.5 text-right tabular-nums text-stone-700"><%= row.headcount || "—" %></td>
+            <td class="px-4 py-3.5 text-right tabular-nums <%= cell_classes.call(tband) %>"><%= format_percent(row.turnover) %></td>
+            <td class="px-4 py-3.5 text-right tabular-nums <%= cell_classes.call(eband) %>"><%= row.engagement&.round(2) || "—" %></td>
+            <td class="px-4 py-3.5 text-right tabular-nums <%= cell_classes.call(aband) %>"><%= format_percent(row.attendance) %></td>
+            <td class="px-4 py-3.5 text-right tabular-nums <%= cell_classes.call(sband) %>">
+              <% if row.sentiment_pos_share %>
+                <%= "#{(row.sentiment_pos_share * 100).round(0)}% pos." %>
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td class="px-4 py-3.5 text-stone-400 text-xs"><%= row.last_updated ? "#{time_ago_in_words(row.last_updated)} ago" : "—" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+<% end %>

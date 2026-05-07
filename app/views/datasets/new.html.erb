@@ -1,0 +1,38 @@
+<% page_title = "Upload dataset" %>
+
+<div class="max-w-2xl">
+  <div class="mb-7">
+    <h1 class="text-xl font-bold text-stone-900">Upload a dataset</h1>
+    <p class="text-sm text-stone-500 mt-1">CSV files are auto-cleaned on import — dates normalized, categoricals standardized, outliers flagged.</p>
+  </div>
+
+  <div class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+    <%= form_with model: Dataset.new, url: datasets_path, multipart: true do |f| %>
+      <div class="px-7 py-6 space-y-6">
+        <div>
+          <%= f.label :name, "Dataset name", class: "block text-sm font-medium text-stone-700 mb-1.5" %>
+          <%= f.text_field :name, placeholder: "Q1 engagement survey", class: "w-full px-3.5 py-2.5 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow" %>
+          <p class="text-xs text-stone-400 mt-1.5">Defaults to filename if left blank.</p>
+        </div>
+
+        <div>
+          <%= f.label :dataset_type, "Dataset type", class: "block text-sm font-medium text-stone-700 mb-1.5" %>
+          <%= f.select :dataset_type, Dataset.dataset_types.keys.map { |k| [k.titleize, k] }, {}, class: "w-full px-3.5 py-2.5 border border-stone-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow" %>
+        </div>
+
+        <div>
+          <%= f.label :file, "CSV file", class: "block text-sm font-medium text-stone-700 mb-1.5" %>
+          <div class="relative">
+            <%= f.file_field :file, accept: ".csv,text/csv", required: true, class: "block w-full text-sm text-stone-600 border border-stone-300 rounded-lg cursor-pointer bg-stone-50 hover:bg-stone-100 transition-colors file:mr-4 file:py-2.5 file:px-4 file:border-0 file:border-r file:border-stone-200 file:bg-transparent file:text-sm file:font-medium file:text-stone-700 file:cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+          </div>
+          <p class="text-xs text-stone-400 mt-1.5">Only .csv files are supported.</p>
+        </div>
+      </div>
+
+      <div class="px-7 py-4 bg-stone-50 border-t border-stone-100 flex items-center gap-3">
+        <%= f.submit "Import dataset", class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors shadow-sm cursor-pointer" %>
+        <%= link_to "Cancel", datasets_path, class: "text-sm text-stone-500 hover:text-stone-800 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>

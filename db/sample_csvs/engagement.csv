@@ -1,0 +1,54 @@
+employee_id,department,role,engagement_score,satisfaction_score,survey_date
+E1001,Engineering,Senior Engineer,4.2,4.0,2025-01-15
+E1002,Engineering,Engineer,3.8,3.5,2025-01-15
+E1003,Engineering,Engineer,4.1,4.2,2025-01-15
+E1004,Engineering,Manager,4.5,4.4,2025-01-15
+E1005,Marketing,Specialist,3.2,3.0,2025-01-16
+E1006,Marketing,Specialist,3.5,3.3,2025-01-16
+E1007,Marketing,Manager,4.0,3.8,2025-01-16
+E1008,Marketing,Coordinator,2.8,2.5,2025-01-16
+E1009,Sales,AE,3.6,3.4,2025-01-17
+E1010,Sales,AE,3.9,3.7,2025-01-17
+E1011,Sales,SDR,3.1,2.9,2025-01-17
+E1012,Sales,Manager,4.3,4.1,2025-01-17
+E1013,People Ops,HRBP,4.4,4.5,2025-01-18
+E1014,People Ops,Recruiter,4.0,4.2,2025-01-18
+E1015,People Ops,Manager,4.6,4.7,2025-01-18
+E1016,Engineering,Senior Engineer,3.9,3.8,2025-02-15
+E1017,Engineering,Engineer,3.6,3.5,2025-02-15
+E1018,Engineering,Engineer,4.0,3.9,2025-02-15
+E1019,Marketing,Specialist,3.3,3.1,2025-02-16
+E1020,Marketing,Manager,4.2,4.0,2025-02-16
+E1021,Sales,AE,3.5,3.3,2025-02-17
+E1022,Sales,SDR,2.9,2.7,2025-02-17
+E1023,People Ops,HRBP,4.5,4.6,2025-02-18
+E1024,People Ops,Recruiter,4.1,4.3,2025-02-18
+E1025,Engineering,Engineer,4.3,4.1,2025-03-15
+E1026,Engineering,Senior Engineer,4.0,3.9,2025-03-15
+E1027,Marketing,Specialist,3.4,3.2,2025-03-16
+E1028,Marketing,Coordinator,3.1,2.9,2025-03-16
+E1029,Sales,AE,3.8,3.6,2025-03-17
+E1030,Sales,Manager,4.4,4.2,2025-03-17
+E1031,People Ops,HRBP,4.3,4.4,2025-03-18
+E1032,Engineering,Engineer,3.7,3.6,2025-04-15
+E1033,Engineering,Manager,4.6,4.5,2025-04-15
+E1034,Marketing,Specialist,3.3,3.0,2025-04-16
+E1035,Marketing,Manager,4.0,3.9,2025-04-16
+E1036,Sales,AE,3.6,3.4,2025-04-17
+E1037,Sales,SDR,3.0,2.8,2025-04-17
+E1038,People Ops,Manager,4.7,4.8,2025-04-18
+E1039,Engineering,Senior Engineer,4.1,4.0,2025-05-15
+E1040,Engineering,Engineer,3.9,3.7,2025-05-15
+E1041,Marketing,Manager,4.3,4.1,2025-05-16
+E1042,Marketing,Specialist,3.5,3.3,2025-05-16
+E1043,Sales,AE,3.7,3.5,2025-05-17
+E1044,Sales,AE,4.0,3.9,2025-05-17
+E1045,People Ops,HRBP,4.6,4.7,2025-05-18
+E1046,Engineering,Engineer,4.2,4.0,2025-06-15
+E1047,Engineering,Engineer,3.8,3.6,2025-06-15
+E1048,Marketing,Coordinator,2.9,2.7,2025-06-16
+E1049,Marketing,Specialist,3.6,3.4,2025-06-16
+E1050,Sales,Manager,4.5,4.3,2025-06-17
+E1051,Sales,SDR,3.2,3.0,2025-06-17
+E1052,People Ops,Recruiter,4.2,4.4,2025-06-18
+E1001,Engineering,Senior Engineer,4.4,4.2,2025-06-15

@@ -1,0 +1,102 @@
+<% feedback = snapshot["feedback"] || {} %>
+
+<% if feedback.empty? || feedback["response_count"].to_i.zero? %>
+  <%= render "empty_section", message: "No feedback dataset linked yet." %>
+<% else %>
+  <% breakdown = feedback["sentiment_breakdown"] || {} %>
+  <% total = (breakdown.values.map(&:to_i).sum.nonzero? || 1).to_f %>
+
+  <div class="grid grid-cols-4 gap-4 mb-7">
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Responses</div>
+      <div class="text-3xl font-bold tabular-nums text-stone-900"><%= feedback["response_count"] %></div>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm border-l-4 border-l-emerald-400">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Positive</div>
+      <div class="text-3xl font-bold tabular-nums text-emerald-700"><%= breakdown["positive"] || 0 %></div>
+      <div class="text-[11px] text-stone-400 mt-1"><%= "#{((breakdown["positive"].to_f / total) * 100).round(0)}%" %></div>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm border-l-4 border-l-stone-300">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Neutral</div>
+      <div class="text-3xl font-bold tabular-nums text-stone-600"><%= breakdown["neutral"] || 0 %></div>
+      <div class="text-[11px] text-stone-400 mt-1"><%= "#{((breakdown["neutral"].to_f / total) * 100).round(0)}%" %></div>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm border-l-4 border-l-rose-400">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Negative</div>
+      <div class="text-3xl font-bold tabular-nums text-rose-700"><%= breakdown["negative"] || 0 %></div>
+      <div class="text-[11px] text-stone-400 mt-1"><%= "#{((breakdown["negative"].to_f / total) * 100).round(0)}%" %></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Sentiment breakdown</h2>
+      </div>
+      <div class="px-6 py-5" data-controller="doughnut-chart"
+           data-doughnut-chart-data-value="<%= [
+             { label: 'Positive', count: breakdown['positive'].to_i },
+             { label: 'Neutral', count: breakdown['neutral'].to_i },
+             { label: 'Negative', count: breakdown['negative'].to_i }
+           ].to_json %>"
+           data-doughnut-chart-colors-value='["#10b981","#a8a29e","#f43f5e"]'>
+        <canvas height="220" class="w-full"></canvas>
+      </div>
+    </section>
+
+    <% sent_trend = feedback["sentiment_by_date"] || {} %>
+    <% if sent_trend.any? %>
+      <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-stone-100">
+          <h2 class="text-sm font-semibold text-stone-800">Sentiment over time</h2>
+          <p class="text-xs text-stone-400 mt-0.5">Average score per month (-1 to +1)</p>
+        </div>
+        <div class="px-6 py-5" data-controller="line-chart" data-line-chart-data-value="<%= sent_trend.to_json %>">
+          <canvas height="180" class="w-full"></canvas>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Word cloud</h2>
+      </div>
+      <% wordcloud = feedback["wordcloud"] || [] %>
+      <% wc_counts = wordcloud.map { |e| e["count"].to_i } %>
+      <% wc_min = wc_counts.min || 0 %>
+      <% wc_max = wc_counts.max || 1 %>
+      <% wc_range = (wc_max - wc_min).nonzero? || 1 %>
+      <div class="px-6 py-5 flex flex-wrap gap-x-4 gap-y-2.5">
+        <% wordcloud.each do |entry| %>
+          <% norm = (entry["count"].to_i - wc_min).to_f / wc_range %>
+          <% size_class = case norm
+             when 0.0...0.2 then "text-xs text-stone-300"
+             when 0.2...0.4 then "text-sm text-stone-500"
+             when 0.4...0.6 then "text-base text-stone-600 font-medium"
+             when 0.6...0.8 then "text-lg text-stone-700 font-semibold"
+             else "text-xl text-indigo-700 font-bold"
+             end %>
+          <span class="<%= size_class %> leading-snug"><%= entry["word"] %></span>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Top themes</h2>
+      </div>
+      <% themes = feedback["themes"] || [] %>
+      <% if themes.any? %>
+        <div class="px-6 py-5" data-controller="bar-chart"
+             data-bar-chart-data-value="<%= themes.map { |t| { range: t['term'], count: t['weight'] } }.to_json %>"
+             data-bar-chart-orientation-value="horizontal">
+          <canvas height="<%= [themes.size * 28 + 40, 180].max %>" class="w-full"></canvas>
+        </div>
+      <% else %>
+        <div class="px-6 py-8 text-sm text-stone-400 text-center">No recurring themes detected.</div>
+      <% end %>
+    </section>
+  </div>
+<% end %>

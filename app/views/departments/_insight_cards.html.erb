@@ -1,0 +1,17 @@
+<% return if cards.blank? %>
+
+<section class="mb-6">
+  <h2 class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-3">Insights</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <% cards.each do |card| %>
+      <div class="<%= insight_card_classes(card.severity) %>">
+        <div class="flex items-center gap-2">
+          <span class="text-base"><%= ThresholdService.severity_emoji(card.severity) %></span>
+          <span class="text-[10px] uppercase tracking-widest font-bold opacity-70"><%= card.severity %></span>
+        </div>
+        <div class="text-sm font-semibold mt-1"><%= card.finding %></div>
+        <div class="text-xs opacity-80 mt-0.5 tabular-nums"><%= card.stat %></div>
+      </div>
+    <% end %>
+  </div>
+</section>

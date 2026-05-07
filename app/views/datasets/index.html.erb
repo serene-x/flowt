@@ -1,0 +1,60 @@
+<% page_title = "Datasets" %>
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-xl font-bold text-stone-900">Datasets</h1>
+    <p class="text-sm text-stone-500 mt-0.5"><%= pluralize(@datasets.size, "file") %> imported</p>
+  </div>
+  <%= link_to new_dataset_path, class: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors shadow-sm" do %>
+    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+    Upload dataset
+  <% end %>
+</div>
+
+<% if @datasets.empty? %>
+  <div class="bg-white rounded-xl border border-stone-200 p-12 text-center shadow-sm">
+    <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-4">
+      <svg class="w-7 h-7 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+    </div>
+    <h2 class="text-base font-semibold text-stone-900">No datasets yet</h2>
+    <p class="text-sm text-stone-500 mt-1.5 max-w-xs mx-auto">Upload your first CSV file to start building department intelligence profiles.</p>
+    <%= link_to "Upload a dataset", new_dataset_path, class: "inline-flex items-center gap-2 mt-5 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors shadow-sm" %>
+  </div>
+<% else %>
+  <div class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-[11px] uppercase tracking-wider text-stone-400 bg-stone-50 border-b border-stone-100">
+          <th class="text-left px-6 py-3.5 font-semibold">Name</th>
+          <th class="text-left px-4 py-3.5 font-semibold">Type</th>
+          <th class="text-left px-4 py-3.5 font-semibold">Department</th>
+          <th class="text-right px-4 py-3.5 font-semibold">Rows</th>
+          <th class="text-right px-4 py-3.5 font-semibold">Cols</th>
+          <th class="text-left px-4 py-3.5 font-semibold">Status</th>
+          <th class="text-left px-4 py-3.5 font-semibold">Imported</th>
+          <th class="px-4 py-3.5"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-stone-50">
+        <% @datasets.each do |dataset| %>
+          <tr class="hover:bg-stone-50/60 transition-colors">
+            <td class="px-6 py-3.5">
+              <%= link_to dataset.name, dataset_path(dataset), class: "font-medium text-stone-900 hover:text-indigo-600 transition-colors" %>
+            </td>
+            <td class="px-4 py-3.5"><%= dataset_type_badge(dataset.dataset_type) %></td>
+            <td class="px-4 py-3.5 text-stone-600">
+              <%= dataset.department&.name || content_tag(:span, "—", class: "text-stone-300") %>
+            </td>
+            <td class="px-4 py-3.5 text-right tabular-nums text-stone-600"><%= number_with_delimiter(dataset.row_count) %></td>
+            <td class="px-4 py-3.5 text-right tabular-nums text-stone-600"><%= dataset.dataset_columns.size %></td>
+            <td class="px-4 py-3.5"><span class="<%= status_pill_classes(dataset.status) %>"><%= dataset.status %></span></td>
+            <td class="px-4 py-3.5 text-stone-400 text-xs"><%= dataset.imported_at&.strftime("%b %-d, %Y") || "—" %></td>
+            <td class="px-4 py-3.5 text-right">
+              <%= button_to "Delete", dataset_path(dataset), method: :delete, data: { turbo_confirm: "Delete this dataset?" }, class: "text-xs text-stone-400 hover:text-rose-600 transition-colors" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

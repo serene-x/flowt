@@ -1,0 +1,52 @@
+<% page_title = "Import jobs" %>
+
+<div class="mb-7">
+  <h1 class="text-xl font-bold text-stone-900">Import jobs</h1>
+  <p class="text-sm text-stone-500 mt-0.5">Background processing history</p>
+</div>
+
+<% if @jobs.empty? %>
+  <div class="bg-white rounded-xl border border-stone-200 p-12 text-center shadow-sm">
+    <p class="text-sm text-stone-500">No import jobs yet.</p>
+    <%= link_to "Upload a dataset", new_dataset_path, class: "inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors shadow-sm" %>
+  </div>
+<% else %>
+  <div class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-[11px] uppercase tracking-wider text-stone-400 bg-stone-50 border-b border-stone-100">
+          <th class="text-left px-6 py-3.5 font-semibold">Dataset</th>
+          <th class="text-left px-4 py-3.5 font-semibold">Department</th>
+          <th class="text-left px-4 py-3.5 font-semibold">Status</th>
+          <th class="text-left px-4 py-3.5 font-semibold">Step</th>
+          <th class="text-right px-4 py-3.5 font-semibold">Rows</th>
+          <th class="text-right px-4 py-3.5 font-semibold">Attempts</th>
+          <th class="text-left px-4 py-3.5 font-semibold">Started</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-stone-50">
+        <% @jobs.each do |job| %>
+          <tr class="hover:bg-stone-50/60 transition-colors">
+            <td class="px-6 py-3.5">
+              <%= link_to job.dataset.name, import_job_path(job), class: "font-medium text-stone-900 hover:text-indigo-600 transition-colors" %>
+            </td>
+            <td class="px-4 py-3.5 text-stone-600"><%= job.dataset.department&.name || "—" %></td>
+            <td class="px-4 py-3.5">
+              <% color = case job.status
+                 when "complete" then "bg-emerald-100 text-emerald-700"
+                 when "failed" then "bg-rose-100 text-rose-700"
+                 when "processing" then "bg-indigo-100 text-indigo-700"
+                 else "bg-stone-100 text-stone-600"
+                 end %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold <%= color %>"><%= job.status %></span>
+            </td>
+            <td class="px-4 py-3.5 text-stone-500 text-xs"><%= job.current_step || "—" %></td>
+            <td class="px-4 py-3.5 text-right tabular-nums text-stone-600"><%= number_with_delimiter(job.dataset.row_count) %></td>
+            <td class="px-4 py-3.5 text-right tabular-nums text-stone-600"><%= job.attempt_count %></td>
+            <td class="px-4 py-3.5 text-stone-400 text-xs"><%= job.started_at&.strftime("%b %-d, %H:%M") || job.created_at.strftime("%b %-d, %H:%M") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

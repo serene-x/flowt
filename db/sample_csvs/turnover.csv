@@ -1,0 +1,26 @@
+employee_id,department,role,hire_date,exit_date,reason,tenure_months
+E2001,Engineering,Engineer,2022-03-01,2025-01-15,New Opportunity,35
+E2002,Engineering,Senior Engineer,2019-06-10,2025-01-31,Career Change,66
+E2003,Marketing,Specialist,2023-08-15,2025-02-01,Compensation,18
+E2004,Marketing,Coordinator,2024-01-10,2025-02-15,Work-Life Balance,13
+E2005,Sales,SDR,2024-02-01,2025-01-30,Performance,11
+E2006,Sales,SDR,2024-03-15,2025-02-28,New Opportunity,11
+E2007,Sales,AE,2022-11-01,2025-02-15,Compensation,28
+E2008,Sales,AE,2023-05-01,2025-03-01,Career Change,22
+E2009,People Ops,Recruiter,2023-01-15,2025-01-15,Relocation,24
+E2010,Engineering,Engineer,2024-06-01,2025-03-01,New Opportunity,9
+E2011,Marketing,Specialist,2023-09-01,2025-03-15,Compensation,18
+E2012,Sales,SDR,2024-04-15,2025-03-31,Performance,11
+E2013,Sales,SDR,2024-05-01,2025-04-01,New Opportunity,11
+E2014,Engineering,Senior Engineer,2020-02-15,2025-04-15,Career Change,62
+E2015,People Ops,HRBP,2022-07-01,2025-04-20,New Opportunity,33
+E2016,Marketing,Manager,2021-09-01,2025-05-01,New Opportunity,44
+E2017,Sales,AE,2023-02-01,2025-05-10,Compensation,27
+E2018,Engineering,Engineer,2024-01-01,2025-05-20,Work-Life Balance,16
+E2019,People Ops,Recruiter,2023-06-15,2025-06-01,Career Change,24
+E2020,Sales,SDR,2024-07-01,2025-06-15,Performance,11
+E2021,Marketing,Coordinator,2024-03-01,2025-06-20,Compensation,15
+E2022,Engineering,Engineer,2023-11-01,2025-07-01,New Opportunity,20
+E2023,Sales,AE,2022-08-15,2025-07-10,Compensation,35
+E2024,Engineering,Manager,2021-03-01,2025-07-25,Career Change,52
+E2025,Marketing,Specialist,2024-02-01,2025-08-01,Work-Life Balance,18

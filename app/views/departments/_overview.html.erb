@@ -1,0 +1,162 @@
+<% engagement = snapshot["engagement"] || {} %>
+<% turnover = snapshot["turnover"] || {} %>
+<% events = snapshot["events"] || {} %>
+<% headcount = snapshot["headcount"] || {} %>
+<% feedback = snapshot["feedback"] || {} %>
+<% periods = department_periods(department) %>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">
+  <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+    <div class="flex items-center justify-between mb-1">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400">Headcount</div>
+      <% _h_cur, _h_prev = periods[:headcount] %>
+      <% if headcount["total"] %><%= threshold_badge(:neutral) %><% end %>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <div class="text-3xl font-bold tabular-nums text-stone-900"><%= headcount["total"] || "—" %></div>
+      <%= trend_indicator(_h_cur, _h_prev) %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+    <% avg = engagement["average"] %>
+    <% eng_band = ThresholdService.engagement_band(avg) %>
+    <% _e_cur, _e_prev = periods[:engagement] %>
+    <div class="flex items-center justify-between mb-1">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400">Engagement</div>
+      <%= threshold_badge(eng_band) %>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <div class="text-3xl font-bold tabular-nums <%= engagement_text_class(avg) %>">
+        <%= avg&.round(2) || "—" %>
+      </div>
+      <%= trend_indicator(_e_cur, _e_prev) %>
+    </div>
+    <div class="text-[11px] text-stone-400 mt-1"><%= engagement["sample_size"] || 0 %> responses</div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+    <% turn_band = ThresholdService.turnover_band(turnover["rate"]) %>
+    <div class="flex items-center justify-between mb-1">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400">Turnover</div>
+      <%= threshold_badge(turn_band) %>
+    </div>
+    <div class="text-3xl font-bold tabular-nums text-stone-900"><%= format_percent(turnover["rate"]) %></div>
+    <div class="text-[11px] text-stone-400 mt-1"><%= turnover["exits"] || 0 %> exits</div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+    <% att_band = ThresholdService.attendance_band(events["attendance_rate"]) %>
+    <% _a_cur, _a_prev = periods[:attendance] %>
+    <div class="flex items-center justify-between mb-1">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400">Attendance</div>
+      <%= threshold_badge(att_band) %>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <div class="text-3xl font-bold tabular-nums text-stone-900"><%= format_percent(events["attendance_rate"]) %></div>
+      <%= trend_indicator(_a_cur, _a_prev) %>
+    </div>
+    <div class="text-[11px] text-stone-400 mt-1"><%= events["events"] || 0 %> events tracked</div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-7">
+  <% if (engagement["by_date"] || {}).any? %>
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden lg:col-span-2">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Engagement & satisfaction trend</h2>
+      </div>
+      <div class="px-6 py-5"
+           data-controller="multi-line-chart"
+           data-multi-line-chart-data-value="<%= [
+             { name: 'Engagement', data: engagement['by_date'] || {}, color: '#6366f1' },
+             { name: 'Satisfaction', data: engagement['satisfaction_by_date'] || {}, color: '#10b981' }
+           ].to_json %>">
+        <canvas height="220" class="w-full"></canvas>
+      </div>
+    </section>
+  <% end %>
+
+  <% breakdown = (feedback["sentiment_breakdown"] || {}) %>
+  <% if breakdown.values.map(&:to_i).sum.positive? %>
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Sentiment breakdown</h2>
+      </div>
+      <div class="px-6 py-5"
+           data-controller="doughnut-chart"
+           data-doughnut-chart-data-value="<%= [
+             { label: 'Positive', count: breakdown['positive'].to_i },
+             { label: 'Neutral', count: breakdown['neutral'].to_i },
+             { label: 'Negative', count: breakdown['negative'].to_i }
+           ].to_json %>"
+           data-doughnut-chart-colors-value='["#10b981","#a8a29e","#f43f5e"]'>
+        <canvas height="220" class="w-full"></canvas>
+      </div>
+    </section>
+  <% end %>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-7">
+  <% hc_by_date = engagement["headcount_by_date"] || {} %>
+  <% if hc_by_date.any? %>
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Headcount over time</h2>
+      </div>
+      <div class="px-6 py-5"
+           data-controller="line-chart"
+           data-line-chart-data-value="<%= hc_by_date.to_json %>">
+        <canvas height="180" class="w-full"></canvas>
+      </div>
+    </section>
+  <% end %>
+
+  <% turnover_by_month = turnover["by_month"] || {} %>
+  <% if turnover_by_month.any? %>
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Exits by month</h2>
+      </div>
+      <div class="px-6 py-5"
+           data-controller="bar-chart"
+           data-bar-chart-data-value="<%= turnover_by_month.map { |month, count| { range: month, count: count } }.to_json %>">
+        <canvas height="180" class="w-full"></canvas>
+      </div>
+    </section>
+  <% end %>
+
+  <% att_by_date = events["by_date"] || {} %>
+  <% if att_by_date.any? %>
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Attendance rate trend</h2>
+      </div>
+      <div class="px-6 py-5"
+           data-controller="line-chart"
+           data-line-chart-data-value="<%= att_by_date.to_json %>">
+        <canvas height="180" class="w-full"></canvas>
+      </div>
+    </section>
+  <% end %>
+</div>
+
+<section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+  <div class="px-6 py-4 border-b border-stone-100">
+    <h2 class="text-sm font-semibold text-stone-800">Linked datasets</h2>
+  </div>
+  <% if datasets.empty? %>
+    <div class="px-6 py-10 text-center text-sm text-stone-400">No datasets linked yet.</div>
+  <% else %>
+    <ul class="divide-y divide-stone-50">
+      <% datasets.each do |dataset| %>
+        <li class="px-6 py-3.5 flex items-center gap-3 hover:bg-stone-50/60 transition-colors">
+          <%= dataset_type_badge(dataset.dataset_type) %>
+          <%= link_to dataset.name, dataset_path(dataset), class: "text-sm font-medium text-stone-900 hover:text-indigo-600 transition-colors flex-1 truncate" %>
+          <span class="text-xs text-stone-400 tabular-nums"><%= number_with_delimiter(dataset.row_count) %> rows</span>
+          <span class="<%= status_pill_classes(dataset.status) %>"><%= dataset.status %></span>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

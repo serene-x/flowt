@@ -1,0 +1,67 @@
+<% engagement = snapshot["engagement"] || {} %>
+
+<% if engagement.empty? %>
+  <%= render "empty_section", message: "No engagement dataset linked yet." %>
+<% else %>
+  <div class="grid grid-cols-3 gap-4 mb-7">
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Avg engagement</div>
+      <% avg = engagement["average"] %>
+      <div class="text-3xl font-bold tabular-nums <%= engagement_text_class(avg) %>">
+        <%= avg&.round(2) || "—" %>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Avg satisfaction</div>
+      <div class="text-3xl font-bold tabular-nums text-stone-900"><%= engagement["satisfaction_average"]&.round(2) || "—" %></div>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Sample size</div>
+      <div class="text-3xl font-bold tabular-nums text-stone-900"><%= engagement["sample_size"] || 0 %></div>
+    </div>
+  </div>
+
+  <% trend = engagement["by_date"] || {} %>
+  <% sat_trend = engagement["satisfaction_by_date"] || {} %>
+  <% if trend.any? %>
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden mb-5">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Engagement & satisfaction over time</h2>
+      </div>
+      <div class="px-6 py-5"
+           data-controller="multi-line-chart"
+           data-multi-line-chart-data-value="<%= [
+             { name: 'Engagement', data: trend, color: '#6366f1' },
+             { name: 'Satisfaction', data: sat_trend, color: '#10b981' }
+           ].to_json %>">
+        <canvas height="240" class="w-full"></canvas>
+      </div>
+    </section>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <% distribution = engagement["distribution"] || [] %>
+    <% if distribution.any? && distribution.any? { |b| b["count"].to_i > 0 } %>
+      <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-stone-100">
+          <h2 class="text-sm font-semibold text-stone-800">Score distribution</h2>
+        </div>
+        <div class="px-6 py-5" data-controller="bar-chart" data-bar-chart-data-value="<%= distribution.map { |b| { range: b['range'], count: b['count'] } }.to_json %>">
+          <canvas height="200" class="w-full"></canvas>
+        </div>
+      </section>
+    <% end %>
+
+    <% by_role = engagement["by_role"] || {} %>
+    <% if by_role.any? %>
+      <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-stone-100">
+          <h2 class="text-sm font-semibold text-stone-800">Average engagement by role</h2>
+        </div>
+        <div class="px-6 py-5" data-controller="bar-chart" data-bar-chart-data-value="<%= by_role.map { |k, v| { range: k, count: v.round(2) } }.to_json %>" data-bar-chart-orientation-value="horizontal">
+          <canvas height="<%= [[by_role.size * 30 + 40, 160].max, 600].min %>" class="w-full"></canvas>
+        </div>
+      </section>
+    <% end %>
+  </div>
+<% end %>

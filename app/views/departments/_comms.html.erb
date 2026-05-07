@@ -1,0 +1,36 @@
+<% comms = snapshot["communications"] || {} %>
+
+<% if comms.empty? %>
+  <%= render "empty_section", message: "No communications data yet. Upload a feedback dataset that includes preferred channel and update frequency." %>
+<% else %>
+  <div class="grid grid-cols-2 gap-4 mb-7">
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Preferred channel</div>
+      <div class="text-2xl font-bold text-indigo-700 mt-1 capitalize"><%= comms["preferred_channel"] || "—" %></div>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 px-5 py-4 shadow-sm">
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-stone-400 mb-1">Preferred frequency</div>
+      <div class="text-2xl font-bold text-indigo-700 mt-1 capitalize"><%= comms["preferred_frequency"] || "—" %></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-5">
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Channel distribution</h2>
+      </div>
+      <div class="px-6 py-5" data-controller="bar-chart" data-bar-chart-data-value="<%= (comms['channel_distribution'] || {}).map { |k,v| {range: k, count: v} }.to_json %>" data-bar-chart-orientation-value="horizontal">
+        <canvas height="160" class="w-full"></canvas>
+      </div>
+    </section>
+
+    <section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-100">
+        <h2 class="text-sm font-semibold text-stone-800">Update frequency</h2>
+      </div>
+      <div class="px-6 py-5" data-controller="bar-chart" data-bar-chart-data-value="<%= (comms['frequency_distribution'] || {}).map { |k,v| {range: k, count: v} }.to_json %>" data-bar-chart-orientation-value="horizontal">
+        <canvas height="160" class="w-full"></canvas>
+      </div>
+    </section>
+  </div>
+<% end %>

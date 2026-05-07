@@ -1,0 +1,19 @@
+<% return if recommendations.blank? %>
+
+<section class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden mb-7">
+  <div class="px-6 py-4 border-b border-stone-100 flex items-center gap-2.5">
+    <svg class="w-4 h-4 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+    <h2 class="text-sm font-semibold text-stone-800">Recommended actions</h2>
+  </div>
+  <ul class="divide-y divide-stone-50">
+    <% recommendations.each do |rec| %>
+      <li class="px-6 py-4 flex items-start gap-4">
+        <%= priority_badge(rec.priority) %>
+        <div class="flex-1">
+          <div class="text-sm font-semibold text-stone-900"><%= rec.action %></div>
+          <div class="text-xs text-stone-500 mt-1 leading-relaxed"><%= rec.rationale %></div>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</section>
