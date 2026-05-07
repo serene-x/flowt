@@ -24,7 +24,7 @@ Sidekiq handles imports in the background, so you'll want Redis running. In a se
 bundle exec sidekiq
 ```
 
-Set your Anthropic key in `.env` if you want AI department summaries (the app works without it, just falls back to a stat-based summary):
+Set your Anthropic key in `.env` if you want AI department summaries.
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
