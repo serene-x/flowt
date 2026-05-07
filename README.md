@@ -38,7 +38,7 @@ bundle exec rspec
 
 ## How it works
 
-Upload a CSV on the Datasets page. Flowt detects column types, runs a cleaning pipeline (trims whitespace, normalises dates, flags IQR outliers, deduplicates), and writes cleaned rows to the database. If the file has a `department` column, it automatically maps rows to departments — typos and abbreviations included (`Mktg` → Marketing, `Enginering` → Engineering, etc).
+Upload a CSV on the Datasets page. Flowt detects column types, runs a cleaning pipeline (trims whitespace, normalises dates, flags IQR outliers, deduplicates), and writes cleaned rows to the database. If the file has a `department` column, it automatically maps rows to departments.
 
 Department profiles are computed from all linked datasets. The overview page shows engagement trends, turnover by month, attendance rate, and feedback sentiment, updated every time you upload new data.
 
